@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+# Grab version
+clojure_version=$(mvn -B help:evaluate -Dexpression=project.version 2>/dev/null| grep -v "^\[")
+echo "Building deb version $clojure_version"
+
+target_base="/clojure"
+
+docker_image=ruby:2.4-stretch
+
+fpm_build=$(
+  docker run -d \
+    --workdir "$target_base" \
+    -v "$PWD/target:$target_base" \
+    ${docker_image} \
+    tail -f /dev/null)
+
+docker exec "$fpm_build" gem install fpm
+
+docker exec "$fpm_build" \
+  fpm \
+  --package "clojure-${clojure_version}.deb" \
+  -s dir \
+  -t deb \
+  --name clojure-cli \
+  --description "The Clojure Programming Language" \
+  --url "https://clojure.org" \
+  --version "${clojure_version}" \
+  --depends java8-runtime-headless \
+  --depends rlwrap \
+  --conflicts 'openjdk-9-jre-headless (<< 9~b181)' \
+  --conflicts clojure \
+  --architecture all \
+  --chdir "${target_base}" \
+  clj=/usr/bin/ \
+  clojure=/usr/bin/ \
+  deps.edn=/usr/share/clojure/ \
+  example-deps.edn=/usr/share/clojure/ \
+  "clojure-scripts-${clojure_version}.jar=/usr/share/clojure/"
+
+docker rm -f "$fpm_build"
+
+echo
+echo "Package built: target/clojure-${clojure_version}.deb"
