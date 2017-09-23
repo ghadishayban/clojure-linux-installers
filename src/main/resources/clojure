@@ -62,7 +62,7 @@ if [[ ! -n "$JAVA_CMD" ]]; then
 fi
 
 # Set dir containing the installed files
-install_dir=PREFIX
+install_dir=/usr/share/clojure
 
 # Determine user config directory
 if [[ -n "$CLJ_CONFIG" ]]; then
@@ -146,7 +146,7 @@ if "$stale"; then
   if "$verbose"; then
     echo "Refreshing classpath"
   fi
-  tools_cp="$install_dir/libexec/clojure-scripts-${project.version}.jar"
+  tools_cp="$install_dir/clojure-scripts-${project.version}.jar"
   tools_args=()
 
   if [[ -n "$resolve_aliases" ]]; then
