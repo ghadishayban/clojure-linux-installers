@@ -20,15 +20,7 @@ cp target/classes/clojure target
 cp target/classes/clj target
 cp target/classes/deps.edn target
 cp target/classes/example-deps.edn target
-cp target/classes/install.sh target
-chmod +x target/clojure target/clj target/install.sh
-tar -cvzf "target/clojure-scripts-${version}.tar.gz" -Ctarget "clojure-scripts-${version}.jar" clojure clj deps.edn example-deps.edn install.sh
-
-# Create formula file
-echo "Creating formula file"
-cp target/classes/clojure.rb target
-sha=$(shasum -a 256 "target/clojure-scripts-${version}.tar.gz" | cut -c 1-64)
-perl -pi.bak -e "s,SHA,$sha,g" target/clojure.rb
+chmod +x target/clojure target/clj
 
 # Deploy to s3
 if [[ ! -z "$S3_BUCKET" ]]; then
